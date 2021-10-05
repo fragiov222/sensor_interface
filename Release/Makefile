@@ -54,11 +54,13 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../sensor_reader/main.cpp \
 		../sensor_reader/mainwindow.cpp \
-		../sensor_reader/serialconn.cpp moc_mainwindow.cpp \
+		../sensor_reader/serialconn.cpp qrc_project_icons.cpp \
+		moc_mainwindow.cpp \
 		moc_serialconn.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		serialconn.o \
+		qrc_project_icons.o \
 		moc_mainwindow.o \
 		moc_serialconn.o
 DIST          = ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_pre.prf \
@@ -235,6 +237,7 @@ DIST          = ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_pre.prf 
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/qt_config.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_post.prf \
+		../sensor_reader/.qmake.stash \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/toolchain.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/default_pre.prf \
@@ -444,6 +447,7 @@ Makefile: ../sensor_reader/sensor_reader.pro ../../../Qt5.12.11/5.12.11/gcc_64/m
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/qt_config.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/toolchain.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/default_pre.prf \
@@ -463,7 +467,8 @@ Makefile: ../sensor_reader/sensor_reader.pro ../../../Qt5.12.11/5.12.11/gcc_64/m
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/exceptions.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/yacc.prf \
 		../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/lex.prf \
-		../sensor_reader/sensor_reader.pro
+		../sensor_reader/sensor_reader.pro \
+		../sensor_reader/project_icons.qrc
 	$(QMAKE) -o Makefile ../sensor_reader/sensor_reader.pro -spec linux-g++ CONFIG+=qtquickcompiler
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_pre.prf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/common/unix.conf:
@@ -639,6 +644,7 @@ Makefile: ../sensor_reader/sensor_reader.pro ../../../Qt5.12.11/5.12.11/gcc_64/m
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/qt_config.prf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++/qmake.conf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/exclusive_builds.prf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/toolchain.prf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/default_pre.prf:
@@ -659,6 +665,7 @@ Makefile: ../sensor_reader/sensor_reader.pro ../../../Qt5.12.11/5.12.11/gcc_64/m
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/yacc.prf:
 ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/lex.prf:
 ../sensor_reader/sensor_reader.pro:
+../sensor_reader/project_icons.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../sensor_reader/sensor_reader.pro -spec linux-g++ CONFIG+=qtquickcompiler
 
@@ -673,6 +680,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../sensor_reader/project_icons.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../sensor_reader/mainwindow.h ../sensor_reader/msg_struct.h ../sensor_reader/serialconn.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../sensor_reader/main.cpp ../sensor_reader/mainwindow.cpp ../sensor_reader/serialconn.cpp $(DISTDIR)/
@@ -700,8 +708,15 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_project_icons.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_project_icons.cpp
+qrc_project_icons.cpp: ../sensor_reader/project_icons.qrc \
+		../../../Qt5.12.11/5.12.11/gcc_64/bin/rcc \
+		../sensor_reader/green_dot.png \
+		../sensor_reader/red_dot.png
+	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/rcc -name project_icons ../sensor_reader/project_icons.qrc -o qrc_project_icons.cpp
+
 compiler_qmlcache_make_all:
 compiler_qmlcache_clean:
 compiler_qmlcache_loader_make_all: qmlcache_loader.cpp
@@ -856,6 +871,8 @@ moc_mainwindow.cpp: ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportinfo.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportglobal.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -866,7 +883,6 @@ moc_mainwindow.cpp: ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qbasictimer.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QElapsedTimer \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qelapsedtimer.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QFile \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QXmlStreamReader \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qxmlstream.h \
@@ -1033,7 +1049,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -1177,6 +1193,8 @@ main.o: ../sensor_reader/main.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportinfo.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportglobal.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -1187,7 +1205,6 @@ main.o: ../sensor_reader/main.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qbasictimer.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QElapsedTimer \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qelapsedtimer.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QFile \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QXmlStreamReader \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qxmlstream.h \
@@ -1348,6 +1365,8 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportinfo.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/qserialportglobal.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -1358,7 +1377,6 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qbasictimer.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QElapsedTimer \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qelapsedtimer.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QFile \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QXmlStreamReader \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qxmlstream.h \
@@ -1370,7 +1388,22 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QThread \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h \
-		ui_mainwindow.h
+		ui_mainwindow.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QVariant \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QApplication \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qeventloop.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qguiapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qinputmethod.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QMenuBar \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenubar.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenu.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qaction.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qactiongroup.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QStatusBar \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qstatusbar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../sensor_reader/mainwindow.cpp
 
 serialconn.o: ../sensor_reader/serialconn.cpp ../sensor_reader/serialconn.h \
@@ -1504,6 +1537,9 @@ serialconn.o: ../sensor_reader/serialconn.cpp ../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o serialconn.o ../sensor_reader/serialconn.cpp
+
+qrc_project_icons.o: qrc_project_icons.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_project_icons.o qrc_project_icons.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

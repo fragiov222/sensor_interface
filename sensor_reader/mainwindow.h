@@ -11,7 +11,11 @@
 #include <QPushButton>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
+#include "QPixmap"
+#include <QString>
+
 #include "serialconn.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +32,7 @@ public:
 public slots:
     void MW_connectBtnHandle();
     void MW_ComboConnIndexChanged(int index);
+    void MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
 
 private:
     Ui::MainWindow *ui;
@@ -42,13 +47,47 @@ private:
     // Serial connection
     SerialConn *my_serial;
 
-    // Sensor data receiver Connection widgets
+    // Connection widgets
     QFormLayout *connection_layout;
     QLabel *lbl_serial_port;
     QComboBox *combo_serial_port;
     QPushButton *connect_button;
     QFormLayout *table_layout;
 
+    // Initialization GroupBox
+    QGroupBox *box_init_msg;
+    QVBoxLayout *layout_init_msg;
+    QPixmap redscaled;
+    QPixmap greenscaled;
+
+    QLabel *led_tof1;
+    QLabel *led_tof2;
+    QLabel *led_tof3;
+    QLabel *led_tof4;
+    QLabel *led_tof5;
+    QLabel *led_tof6;
+    QLabel *led_tof7;
+    QLabel *led_tof8;
+
+    QLabel *lbl_tof1;
+    QLabel *lbl_tof2;
+    QLabel *lbl_tof3;
+    QLabel *lbl_tof4;
+    QLabel *lbl_tof5;
+    QLabel *lbl_tof6;
+    QLabel *lbl_tof7;
+    QLabel *lbl_tof8;
+
+    QFormLayout *led_layout_tof1;
+    QFormLayout *led_layout_tof2;
+    QFormLayout *led_layout_tof3;
+    QFormLayout *led_layout_tof4;
+    QFormLayout *led_layout_tof5;
+    QFormLayout *led_layout_tof6;
+    QFormLayout *led_layout_tof7;
+    QFormLayout *led_layout_tof8;
+
+    void mw_boxInitMsgConfig();
 
 };
 #endif // MAINWINDOW_H

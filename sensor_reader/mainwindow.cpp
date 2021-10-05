@@ -4,7 +4,7 @@
 
 
 #define         WINDOW_WIDTH                        1200
-#define         WINDOW_HEIGTH                       700
+#define         WINDOW_HEIGTH                       600
 
 /*
  *******************************************************************************
@@ -13,6 +13,8 @@
  */
 static bool flag_conn = 0;          // true if the connection is established
 QString serial_port_name = "";
+static QPixmap *green;
+static QPixmap *red;
 
 /*!
  * *******************************************************************************
@@ -96,13 +98,16 @@ MainWindow::MainWindow(QWidget *parent)
     layout_h_conn->setAlignment(connect_button,Qt::AlignVCenter);
     layout_h_conn->addStretch();
 
-    layout_v_sensors = new QVBoxLayout;
     data_layout = new QHBoxLayout;
+
+    // Dichiarazione Received Message GroupBox e configurazione
+    box_init_msg = new QGroupBox("Sensors available");
+    mw_boxInitMsgConfig();
 
     // Inserisco gli oggetti all interno del layout
     receiver_layout = new QGridLayout();
     receiver_layout->addLayout(layout_h_conn,0,0);
-    receiver_layout->addLayout(layout_v_sensors,1,0);
+    receiver_layout->addWidget(box_init_msg,1,0);
     receiver_layout->addLayout(data_layout,2,0);
 
     // Inserisco il layout che ho formattato all interno del widget principale
@@ -114,6 +119,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Gestione dei click sul pulsante "connect" per la connessione alla porta seriale
     connect(this->connect_button, SIGNAL(clicked(bool)),this,SLOT(MW_connectBtnHandle()));
     connect(combo_serial_port, SIGNAL(currentIndexChanged(int)),this,SLOT(MW_ComboConnIndexChanged(int)));
+    connect(my_serial, SIGNAL(SC_sendInitMsgInfo(VL53LX_INIT_MSG *)), this,
+                                    SLOT(MW_receiveInitMsgInfo(VL53LX_INIT_MSG *)));
 }
 
 MainWindow::~MainWindow()
@@ -221,3 +228,255 @@ void MainWindow::MW_ComboConnIndexChanged(int index)
 
 } // MW_ComboConnIndexChanged()
 
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::mw_boxInitMsgConfig()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione configura la groupBox di ricezione messaggi init
+ *
+ * \n<b>Parameters</b>:\n
+ *
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 05/10/2021
+ * \n- Author: Frnacesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void MainWindow::mw_boxInitMsgConfig()
+{
+    box_init_msg->setMinimumWidth(250);
+    box_init_msg->setMaximumWidth(250);
+    box_init_msg->setMinimumHeight(550);
+    box_init_msg->setMaximumHeight(550);
+
+    layout_init_msg = new QVBoxLayout();
+
+    lbl_tof1 = new QLabel("ToF #1");
+    lbl_tof2 = new QLabel("ToF #2");
+    lbl_tof3 = new QLabel("ToF #3");
+    lbl_tof4 = new QLabel("ToF #4");
+    lbl_tof5 = new QLabel("ToF #5");
+    lbl_tof6 = new QLabel("ToF #6");
+    lbl_tof7 = new QLabel("ToF #7");
+    lbl_tof8 = new QLabel("ToF #8");
+
+    green = new QPixmap(":/images/green_dot.png");
+    red = new QPixmap(":/images/red_dot.png");
+    greenscaled = green->scaled(QSize(25,25));
+    redscaled   = red->scaled(QSize(25,25));
+
+    led_tof1 = new QLabel;
+    led_tof2 = new QLabel;
+    led_tof3 = new QLabel;
+    led_tof4 = new QLabel;
+    led_tof5 = new QLabel;
+    led_tof6 = new QLabel;
+    led_tof7 = new QLabel;
+    led_tof8 = new QLabel;
+
+    led_tof1->setPixmap(redscaled);
+    led_tof2->setPixmap(redscaled);
+    led_tof3->setPixmap(redscaled);
+    led_tof4->setPixmap(redscaled);
+    led_tof5->setPixmap(redscaled);
+    led_tof6->setPixmap(redscaled);
+    led_tof7->setPixmap(redscaled);
+    led_tof8->setPixmap(redscaled);
+
+    led_layout_tof1 = new QFormLayout();
+    led_layout_tof2 = new QFormLayout();
+    led_layout_tof3 = new QFormLayout();
+    led_layout_tof4 = new QFormLayout();
+    led_layout_tof5 = new QFormLayout();
+    led_layout_tof6 = new QFormLayout();
+    led_layout_tof7 = new QFormLayout();
+    led_layout_tof8 = new QFormLayout();
+
+    led_layout_tof1 -> addRow(led_tof1,lbl_tof1);
+    led_layout_tof2 -> addRow(led_tof2,lbl_tof2);
+    led_layout_tof3 -> addRow(led_tof3,lbl_tof3);
+    led_layout_tof4 -> addRow(led_tof4,lbl_tof4);
+    led_layout_tof5 -> addRow(led_tof5,lbl_tof5);
+    led_layout_tof6 -> addRow(led_tof6,lbl_tof6);
+    led_layout_tof7 -> addRow(led_tof7,lbl_tof7);
+    led_layout_tof8 -> addRow(led_tof8,lbl_tof8);
+
+    layout_init_msg ->addLayout(led_layout_tof1);
+    layout_init_msg ->addLayout(led_layout_tof2);
+    layout_init_msg ->addLayout(led_layout_tof3);
+    layout_init_msg ->addLayout(led_layout_tof4);
+    layout_init_msg ->addLayout(led_layout_tof5);
+    layout_init_msg ->addLayout(led_layout_tof6);
+    layout_init_msg ->addLayout(led_layout_tof7);
+    layout_init_msg ->addLayout(led_layout_tof8);
+
+    box_init_msg->setLayout(layout_init_msg);
+}
+
+
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::MW_receiveInitMsgInfo()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce
+ *
+ * \n<b>Parameters</b>:\n
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void MainWindow::MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init)
+{
+    uint8 msg_id = static_cast<uint8>(rcv_msg_init->header.msg_id);
+    uint8 tof_id = static_cast<uint8>(rcv_msg_init->tof_id);
+    uint8 tof_status = static_cast<uint8>(rcv_msg_init->tof_status);
+
+
+
+    if(msg_id == ID_VL53LX_INIT_MSG)
+    {
+        switch(tof_id)
+        {
+        case 1:
+
+            if(tof_status == 0)
+            {
+                led_tof1->setPixmap(redscaled);
+                qDebug() << "ToF 1 STATUS 0";
+            }
+            else if(tof_status == 1)
+            {
+                led_tof1->setPixmap(greenscaled);
+                qDebug() << "ToF 1 STATUS 1";
+            }
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof1->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 2:
+
+            if(tof_status == 0)
+                led_tof2->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof2->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof2->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 3:
+
+            if(tof_status == 0)
+                led_tof3->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof3->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof3->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 5:
+
+            if(tof_status == 0)
+                led_tof5->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof5->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof5->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 6:
+
+            if(tof_status == 0)
+                led_tof6->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof6->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof6->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 7:
+
+            if(tof_status == 0)
+                led_tof7->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof7->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof7->setPixmap(redscaled);
+            }
+
+            break;
+
+        case 8:
+
+            if(tof_status == 0)
+                led_tof8->setPixmap(redscaled);
+            else if(tof_status == 1)
+                led_tof8->setPixmap(greenscaled);
+            else
+            {
+                qDebug() << "WRONG ToF STATUS";
+                led_tof8->setPixmap(redscaled);
+            }
+
+            break;
+        }
+    }
+}

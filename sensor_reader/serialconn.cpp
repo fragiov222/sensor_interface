@@ -161,11 +161,6 @@ void SerialConn::sc_configSerialConn()
  *
  * \n<b>Returns</b>:\n
  *
- *
- *
- *
- *
- *
  * 		Nessuno
  *
  * \n<b>Note & Remarks</b>:\n
@@ -488,7 +483,9 @@ void SerialConn::sc_ManageRcvMsg(uint8 len)
         //fflush(stdout);
         qDebug() << "\nVL53LX_INIT_MSG\n\n";
         rcv_msg_init = reinterpret_cast<VL53LX_INIT_MSG*>(rcv_buf);
-        //sc_verifyCRCforKA(computed_crc);
+
+        // Mando le info al MainWindow in modo che riempa tabella e scriva nelle label
+        emit SC_sendInitMsgInfo(rcv_msg_init);
 
         break;
 

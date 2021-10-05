@@ -65,6 +65,9 @@ public:
     SerialConn();
     ~SerialConn();
 
+signals:
+    void SC_sendInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
+
 public slots:
 
     void SC_readDataHandle();
