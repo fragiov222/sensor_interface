@@ -279,8 +279,8 @@ void MainWindow::mw_boxInitMsgConfig()
 
     green = new QPixmap(":/images/green_dot.png");
     red = new QPixmap(":/images/red_dot.png");
-    greenscaled = green->scaled(QSize(25,25));
-    redscaled   = red->scaled(QSize(25,25));
+    greenscaled = green->scaled(QSize(20,20));
+    redscaled   = red->scaled(QSize(20,20));
 
     led_tof1 = new QLabel;
     led_tof2 = new QLabel;

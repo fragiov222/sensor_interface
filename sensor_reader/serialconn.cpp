@@ -38,11 +38,10 @@
 static char rcv_buf [MAX_LEN_MSG];      // buffer dei dati da ricevere
 
 // variabili utilizzate per la lettura dei messaggi ricevuti
-static bool rcv_new_msg;                // TRUE se i dati letti si riferiscono a un nuovo messaggio;
                                         // FALSE se i dati ricevuti appartengono a un messaggio già in lettura
-static uint8 rcv_bytes_read;            // numero di byte letti per il mesaggio in lettura
-static uint8 rcv_bytes_to_read;         // numero di byte ancora da leggere per il messaggio in lettura (<= rcv_msg_rcv_len)
-static uint8 rcv_msg_rcv_len;           // numero di byte del messaggio
+static uint16 rcv_bytes_read;            // numero di byte letti per il mesaggio in lettura
+static uint16 rcv_bytes_to_read;         // numero di byte ancora da leggere per il messaggio in lettura (<= rcv_msg_rcv_len)
+static uint16 rcv_msg_rcv_len;           // numero di byte del messaggio
 
 /*!
  * *******************************************************************************
@@ -308,8 +307,8 @@ SerialConn::~SerialConn()
 void SerialConn::SC_readDataHandle()
 {
 
-    uint8 tmp_data_size = 0;
-    uint8 bytes_in_serial = 0;
+    uint16 tmp_data_size = 0;
+    uint16 bytes_in_serial = 0;
 
     // contatore messaggi ricevuti/inviati
     static int counter;
@@ -317,7 +316,7 @@ void SerialConn::SC_readDataHandle()
     //check how many bytes are available in the serial buffer
     bytes_in_serial = serial->bytesAvailable();
 
-    rcv_new_msg = TRUE;
+    static bool rcv_new_msg = TRUE;                // TRUE se i dati letti si riferiscono a un nuovo messaggio;
 
     try
     {
@@ -332,7 +331,7 @@ void SerialConn::SC_readDataHandle()
                 memset(rcv_buf, 0, sizeof(rcv_buf));
 
                 // lettura header del messaggio -> se i dati in ingresso sono supeiori alla dimensione dell'header
-                if ( bytes_in_serial >= static_cast<uint8>(sizeof(MSG_HEADER)) )
+                if ( bytes_in_serial >= static_cast<uint16>(sizeof(MSG_HEADER)) )
                 {
 
                     MSG_HEADER *message_header = new MSG_HEADER();
@@ -347,7 +346,7 @@ void SerialConn::SC_readDataHandle()
                     rcv_msg_rcv_len = message_header->msg_len;
 
                     // byte ancora da leggere
-                    rcv_bytes_to_read = static_cast<uint8>(rcv_msg_rcv_len) - rcv_bytes_read;
+                    rcv_bytes_to_read = static_cast<uint16>(rcv_msg_rcv_len) - rcv_bytes_read;
 
                     // se nel canale ci sono più di msg_len bytes -> aggiorna il numero di byte nel canale
                     // sottrae il numero di byte dell'header
@@ -373,15 +372,13 @@ void SerialConn::SC_readDataHandle()
             {
                 tmp_data_size = 0;
 
-                while (tmp_data_size < bytes_in_serial)
+                while(tmp_data_size < bytes_in_serial)
                 {
                     tmp_data_size += serial->read(rcv_buf + rcv_bytes_read, bytes_in_serial - tmp_data_size);
 
-                    // incremento il numero di bytes letti
+                    rcv_bytes_to_read -= tmp_data_size;
                     rcv_bytes_read += tmp_data_size;
 
-                    // decremento il numero di bytes da leggere
-                    rcv_bytes_to_read -= tmp_data_size;
                 }
             }
 
@@ -399,15 +396,13 @@ void SerialConn::SC_readDataHandle()
              bytes_in_serial -= tmp_data_size;
 
             // se i bytes letti sono uguali al msglen => ho ricevuto il messaggio completamente
-            if (rcv_bytes_read == static_cast<uint8>(rcv_msg_rcv_len))
+            if (rcv_bytes_read == static_cast<uint16>(rcv_msg_rcv_len))
             {
                 // TRUE => il prossimo messaggio è un nuovo messaggio
                 rcv_new_msg = TRUE;
 
                 // funzione per gestione msg ricevuti
                 sc_ManageRcvMsg(rcv_msg_rcv_len);
-
-                bytes_in_serial = serial->bytesAvailable();
             }
 
         }
@@ -460,14 +455,15 @@ void SerialConn::SC_readDataHandle()
  ********************************************************************************
  */
 
-void SerialConn::sc_ManageRcvMsg(uint8 len)
+void SerialConn::sc_ManageRcvMsg(uint16 len)
 {
 
     // Buffer di dimensione arbitraria per l'invio del messaggio
     //char output_buffer[MAX_LEN_MSG];
     //qint64 elapsed_time = 0;
-    QString msg_origin;
-    QString msg_name;
+    //QString msg_origin;
+    //QString msg_name;
+    int i = 0;
 
     // Segno l'istante in cui ho ricevuto tutto il messaggio
     //elapsed_time = stay_on_timer->elapsed();
@@ -491,11 +487,16 @@ void SerialConn::sc_ManageRcvMsg(uint8 len)
 
     case ID_VL53LX_DATA_MSG:
 
-        printf("\n rcv VL53LX_DATA_MSG");
-        fflush(stdout);
+        qDebug() << "\nVL53LX_DATA_MSG\n\n";
 
         rcv_msg_data = reinterpret_cast<VL53LX_DATA_MSG*>(rcv_buf);
         //sc_verifyCRCforCmd(computed_crc);
+
+        //qDebug() << rcv_msg_data->header.msg_id;
+        //qDebug() << rcv_msg_data->header.msg_len;
+        //qDebug() << rcv_msg_data->id_tof;
+        //qDebug() << rcv_msg_data->object_data;
+
 
         break;
     }

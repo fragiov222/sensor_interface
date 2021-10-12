@@ -83,7 +83,7 @@ private:
     VL53LX_DATA_MSG *rcv_msg_data;
 
     void sc_configSerialConn();
-    void sc_ManageRcvMsg(uint8 len);
+    void sc_ManageRcvMsg(uint16 len);
 };
 
 

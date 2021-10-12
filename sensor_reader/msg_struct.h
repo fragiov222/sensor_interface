@@ -22,12 +22,12 @@
 
 // //////////////////////// MSGS_IDs ///////////////////////////////////
 
-#define MAX_LEN_MSG                 350
+#define MAX_LEN_MSG                 4096
 #define ID_VL53LX_INIT_MSG          1
 #define ID_VL53LX_DATA_MSG          2
 
 #define LEN_VL53LX_INIT_MSG         5
-#define LEN_VL53LX_DATA_MSG         326
+#define LEN_VL53LX_DATA_MSG         324
 #define VL53L5CX_RESOLUTION_64      64
 
 
@@ -62,9 +62,9 @@ typedef struct
 
 typedef struct
 {
-    uint8 range_status[VL53L5CX_RESOLUTION_64];
-    uint16 range_val[VL53L5CX_RESOLUTION_64];
-    uint16 sigma[VL53L5CX_RESOLUTION_64];
+    uint8 range_status;
+    uint16 range_val;
+    uint16 sigma;
 
 } VL53LX_OBJ_INFO;      //len 320
 
@@ -72,10 +72,9 @@ typedef struct
 {
     MSG_HEADER header;
     uint8 id_tof;
-    uint16 time_elapsed;
-    VL53LX_OBJ_INFO object_data;
+    VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_64];
 
-} VL53LX_DATA_MSG;      //len 326
+} VL53LX_DATA_MSG;      //len 324
 
 #pragma pack(pop)
 

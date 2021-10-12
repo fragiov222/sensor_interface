@@ -1388,22 +1388,7 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QThread \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h \
-		ui_mainwindow.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QVariant \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QApplication \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qapplication.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qcoreapplication.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qeventloop.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qguiapplication.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qinputmethod.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QMenuBar \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenubar.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenu.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qaction.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qactiongroup.h \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QStatusBar \
-		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qstatusbar.h
+		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../sensor_reader/mainwindow.cpp
 
 serialconn.o: ../sensor_reader/serialconn.cpp ../sensor_reader/serialconn.h \
