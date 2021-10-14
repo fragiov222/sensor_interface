@@ -67,6 +67,7 @@ public:
 
 signals:
     void SC_sendInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
+    void SC_sendDataMsgInfo(VL53LX_DATA_MSG *rcv_msg_data);
 
 public slots:
 

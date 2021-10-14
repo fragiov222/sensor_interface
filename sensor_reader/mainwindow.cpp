@@ -70,6 +70,109 @@ MainWindow::MainWindow(QWidget *parent)
     receiver_widget->setMinimumWidth(WINDOW_WIDTH);
     receiver_widget->setMinimumHeight(WINDOW_HEIGTH);
 
+
+    // chart elements initialization
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            series = new QLineSeries();
+            *series << QPointF(j, i) << QPointF(j+1, i);
+            series0_left[(8*i)+j] = series;
+        }
+    }
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            series = new QLineSeries();
+            *series << QPointF(j, i+1) << QPointF(j+1, i+1);
+            series1_left[(8*i)+j] = series;
+        }
+    }
+    QPen pen(0x059605);
+    pen.setWidth(1);
+    QColor color(Qt::darkBlue);
+
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(series0_left[i],series1_left[i]);
+        area->setBrush(color);
+        area->setPen(pen);
+
+        areas_left[i] = area;
+    }
+
+    chart_left = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_left->addSeries(areas_left[i]);
+    }
+
+    chart_left->setTitle("Left TOF");
+    chart_left->legend()->hide();
+    chart_left->createDefaultAxes();
+    chart_left->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_left->axes(Qt::Vertical).first()->setRange(0, 8);
+
+    chartView_left = new QChartView(chart_left);
+    chartView_left->setRenderHint(QPainter::Antialiasing);
+    chartView_left->setMinimumSize(400,400);
+    chartView_left->setMaximumSize(400,400);
+
+    // //////////////////
+
+    // chart elements initialization
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            series = new QLineSeries();
+            *series << QPointF(j, i) << QPointF(j+1, i);
+            series0_right[(8*i)+j] = series;
+        }
+    }
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            series = new QLineSeries();
+            *series << QPointF(j, i+1) << QPointF(j+1, i+1);
+            series1_right[(8*i)+j] = series;
+        }
+    }
+    QPen pen_right(0x059605);
+    pen.setWidth(1);
+    QColor color_right(Qt::darkBlue);
+
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(series0_right[i],series1_right[i]);
+        area->setBrush(color_right);
+        area->setPen(pen_right);
+
+        areas_right[i] = area;
+    }
+
+    chart_right = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_right->addSeries(areas_right[i]);
+    }
+
+    chart_right->setTitle("Right TOF");
+    chart_right->legend()->hide();
+    chart_right->createDefaultAxes();
+    chart_right->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_right->axes(Qt::Vertical).first()->setRange(0, 8);
+
+    chartView_right = new QChartView(chart_right);
+    chartView_right->setRenderHint(QPainter::Antialiasing);
+    chartView_right->setMinimumSize(400,400);
+    chartView_right->setMaximumSize(400,400);
+
     // Dichiarazione label di connessione
     lbl_serial_port = new QLabel("Serial port:");
 
@@ -108,7 +211,8 @@ MainWindow::MainWindow(QWidget *parent)
     receiver_layout = new QGridLayout();
     receiver_layout->addLayout(layout_h_conn,0,0);
     receiver_layout->addWidget(box_init_msg,1,0);
-    receiver_layout->addLayout(data_layout,2,0);
+    receiver_layout->addWidget(chartView_left,1,1);
+    receiver_layout->addWidget(chartView_right,1,2);
 
     // Inserisco il layout che ho formattato all interno del widget principale
     receiver_widget->setLayout(receiver_layout);
@@ -119,8 +223,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Gestione dei click sul pulsante "connect" per la connessione alla porta seriale
     connect(this->connect_button, SIGNAL(clicked(bool)),this,SLOT(MW_connectBtnHandle()));
     connect(combo_serial_port, SIGNAL(currentIndexChanged(int)),this,SLOT(MW_ComboConnIndexChanged(int)));
-    connect(my_serial, SIGNAL(SC_sendInitMsgInfo(VL53LX_INIT_MSG *)), this,
-                                    SLOT(MW_receiveInitMsgInfo(VL53LX_INIT_MSG *)));
+    connect(my_serial, SIGNAL(SC_sendInitMsgInfo(VL53LX_INIT_MSG*)), this,
+                                    SLOT(MW_receiveInitMsgInfo(VL53LX_INIT_MSG*)));
+    connect(my_serial, SIGNAL(SC_sendDataMsgInfo(VL53LX_DATA_MSG*)), this,
+                                    SLOT(MW_receiveDataMsgInfo(VL53LX_DATA_MSG*)));
 }
 
 MainWindow::~MainWindow()
@@ -379,12 +485,10 @@ void MainWindow::MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init)
             if(tof_status == 0)
             {
                 led_tof1->setPixmap(redscaled);
-                qDebug() << "ToF 1 STATUS 0";
             }
             else if(tof_status == 1)
             {
                 led_tof1->setPixmap(greenscaled);
-                qDebug() << "ToF 1 STATUS 1";
             }
             else
             {
@@ -479,4 +583,135 @@ void MainWindow::MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init)
             break;
         }
     }
+} //
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::MW_receiveInitMsgInfo()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce
+ *
+ * \n<b>Parameters</b>:\n
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void MainWindow::MW_receiveDataMsgInfo(VL53LX_DATA_MSG *rcv_msg_data)
+{
+    uint8 msg_id = static_cast<uint8>(rcv_msg_data->header.msg_id);
+    uint8 tof_id = static_cast<uint8>(rcv_msg_data->id_tof);
+    uint16 dist;
+    QColor color_dist;
+
+    if(msg_id == ID_VL53LX_DATA_MSG)
+    {
+        switch(tof_id)
+        {
+        case 1:
+            for (int i = 0; i < 64; i++ )
+            {
+                dist = static_cast<uint16>(rcv_msg_data->object_data[i].range_val);
+                //qDebug() << dist << "\n";
+                color_dist = GetColorFromDist(dist);
+                areas_left[i]->setBrush(color_dist);
+            }
+
+            break;
+
+        case 2:
+            for (int i = 0; i < 64; i++ )
+            {
+                dist = static_cast<uint16>(rcv_msg_data->object_data[i].range_val);
+                //qDebug() << dist << "\n";
+                color_dist = GetColorFromDist(dist);
+                areas_right[i]->setBrush(color_dist);
+            }
+
+            break;
+        }
+
+    }
+}
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::mw_boxInitMsgConfig()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione configura la groupBox di ricezione messaggi init
+ *
+ * \n<b>Parameters</b>:\n
+ *
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 05/10/2021
+ * \n- Author: Frnacesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+QColor MainWindow::GetColorFromDist(uint16 dist)
+{
+    QColor color_dist;
+    uint16 value;
+
+    if(dist > 2000)
+    {
+        color_dist.setRgb(0,0,0,255);
+    }
+    else if(dist > 1500 && dist <= 2000)
+    {
+        value = 255 - (((dist-1500)*255)/500);
+        color_dist.setRgb(0,0,value,255);
+    }
+    else if(dist > 1000 && dist <= 1500)
+    {
+        value = 255 - (((dist-1000)*255)/500);
+        color_dist.setRgb(value,0,255,255);
+    }
+    else if(dist > 500 && dist <= 1000)
+    {
+        value = 255 - (((dist-500)*255)/500);
+        color_dist.setRgb(255,value,0,255);
+    }
+    else if(dist > 0 && dist <= 500)
+    {
+        value = 255 - ((dist*255)/500);
+        color_dist.setRgb(255,255,value,255);
+    }
+
+    return color_dist;
 }

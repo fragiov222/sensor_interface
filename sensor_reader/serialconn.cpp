@@ -475,8 +475,6 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
     {
     case ID_VL53LX_INIT_MSG:
 
-        //printf("\n rcv VL53LX_INIT_MSG");
-        //fflush(stdout);
         qDebug() << "\nVL53LX_INIT_MSG\n\n";
         rcv_msg_init = reinterpret_cast<VL53LX_INIT_MSG*>(rcv_buf);
 
@@ -490,12 +488,9 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
         qDebug() << "\nVL53LX_DATA_MSG\n\n";
 
         rcv_msg_data = reinterpret_cast<VL53LX_DATA_MSG*>(rcv_buf);
-        //sc_verifyCRCforCmd(computed_crc);
 
-        //qDebug() << rcv_msg_data->header.msg_id;
-        //qDebug() << rcv_msg_data->header.msg_len;
-        //qDebug() << rcv_msg_data->id_tof;
-        //qDebug() << rcv_msg_data->object_data;
+        emit SC_sendDataMsgInfo(rcv_msg_data);
+
 
 
         break;

@@ -13,13 +13,20 @@
 #include <QDebug>
 #include "QPixmap"
 #include <QString>
-
+#include <QImage>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include "serialconn.h"
-
+#include <QChartView>
+#include <QLineSeries>
+#include <QAreaSeries>
+#include <QColor>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+using namespace QtCharts;
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +40,7 @@ public slots:
     void MW_connectBtnHandle();
     void MW_ComboConnIndexChanged(int index);
     void MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
+    void MW_receiveDataMsgInfo(VL53LX_DATA_MSG *rcv_msg_data);
 
 private:
     Ui::MainWindow *ui;
@@ -46,6 +54,24 @@ private:
 
     // Serial connection
     SerialConn *my_serial;
+
+    //Charts
+    QChartView *chartView_left;
+    QChartView *chartView_right;
+
+    QLineSeries *series0_left[64];
+    QLineSeries *series1_left[64];
+    QLineSeries *series0_right[64];
+    QLineSeries *series1_right[64];
+    QLineSeries *series;
+
+    QAreaSeries *areas_left[64];
+    QAreaSeries *areas_right[64];
+    QAreaSeries *area;
+
+    QChart *chart_left;
+    QChart *chart_right;
+
 
     // Connection widgets
     QFormLayout *connection_layout;
@@ -88,6 +114,7 @@ private:
     QFormLayout *led_layout_tof8;
 
     void mw_boxInitMsgConfig();
+    QColor GetColorFromDist(uint16);
 
 };
 #endif // MAINWINDOW_H
