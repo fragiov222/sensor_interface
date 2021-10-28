@@ -21,6 +21,8 @@
 #include <QLineSeries>
 #include <QAreaSeries>
 #include <QColor>
+#include <QRadioButton>
+#include <QCheckBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,8 +41,21 @@ public:
 public slots:
     void MW_connectBtnHandle();
     void MW_ComboConnIndexChanged(int index);
+
+    void MW_CheckConfigHandle(int check_state);
+
+    void MW_4x4RadioBtnHandle();
+    void MW_8x8RadioBtnHandle();
+
+    void MW_frequencyIndexChanged(int index);
+    void MW_sharpenerIndexChanged(int index);
+
+    void MW_startBtnHandle();
+    void MW_stopBtnHandle();
+
     void MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
-    void MW_receiveDataMsgInfo(VL53LX_DATA_MSG *rcv_msg_data);
+    void MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16);
+    void MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64);
 
 private:
     Ui::MainWindow *ui;
@@ -49,29 +64,42 @@ private:
     QGridLayout *receiver_layout;
     QWidget *receiver_widget;
     QHBoxLayout *layout_h_conn;
-    QHBoxLayout *data_layout;
+    QVBoxLayout *config_layout;
     QVBoxLayout *layout_v_sensors;
+    QHBoxLayout * chart_layout;
+    QHBoxLayout *layout_hue;
+
 
     // Serial connection
     SerialConn *my_serial;
 
     //Charts
-    QChartView *chartView_left;
-    QChartView *chartView_right;
+    QChartView *chartView_1;
+    QChartView *chartView_2;
+    QChartView *chartView_3;
+    QChartView *chartView_4;
 
-    QLineSeries *series0_left[64];
-    QLineSeries *series1_left[64];
-    QLineSeries *series0_right[64];
-    QLineSeries *series1_right[64];
-    QLineSeries *series;
+    QLineSeries *seriesA_1[64];
+    QLineSeries *seriesB_1[64];
+    QLineSeries *seriesA_2[64];
+    QLineSeries *seriesB_2[64];
+    QLineSeries *seriesA_3[64];
+    QLineSeries *seriesB_3[64];
+    QLineSeries *seriesA_4[64];
+    QLineSeries *seriesB_4[64];
+    QLineSeries *seriesA;
+    QLineSeries *seriesB;
 
-    QAreaSeries *areas_left[64];
-    QAreaSeries *areas_right[64];
+    QAreaSeries *areas_1[64];
+    QAreaSeries *areas_2[64];
+    QAreaSeries *areas_3[64];
+    QAreaSeries *areas_4[64];
     QAreaSeries *area;
 
-    QChart *chart_left;
-    QChart *chart_right;
-
+    QChart *chart_1;
+    QChart *chart_2;
+    QChart *chart_3;
+    QChart *chart_4;
 
     // Connection widgets
     QFormLayout *connection_layout;
@@ -85,6 +113,7 @@ private:
     QVBoxLayout *layout_init_msg;
     QPixmap redscaled;
     QPixmap greenscaled;
+    QPixmap hue_wheel_scaled;
 
     QLabel *led_tof1;
     QLabel *led_tof2;
@@ -94,6 +123,8 @@ private:
     QLabel *led_tof6;
     QLabel *led_tof7;
     QLabel *led_tof8;
+    QLabel *hue_left;
+    QLabel *hue_right;
 
     QLabel *lbl_tof1;
     QLabel *lbl_tof2;
@@ -113,8 +144,32 @@ private:
     QFormLayout *led_layout_tof7;
     QFormLayout *led_layout_tof8;
 
+    // Configuration GroupBox
+    QGroupBox *box_configuration;
+    QGridLayout *grid_layout_config;
+    QCheckBox *check_configuration_default;
+    QHBoxLayout *layout_configuration;
+    QVBoxLayout *layout_btn_configuration;
+    QVBoxLayout *layout_complete;
+    QGroupBox *box_resolution;
+    QGroupBox *box_frequency;
+    QGroupBox *box_sharpener;
+    QRadioButton *radio_resolution_8x8;
+    QRadioButton *radio_resolution_4x4;
+    QComboBox *combo_frequency;
+    QLabel * lbl_warning_frequency;
+    QComboBox *combo_sharpener;
+    QPushButton *start_button;
+    QPushButton *stop_button;
+    QFormLayout *layout_resolution;
+    QFormLayout *layout_frequency;
+    QFormLayout *layout_sharpener;
+
+
     void mw_boxInitMsgConfig();
-    QColor GetColorFromDist(uint16);
+    void mw_boxChartConfig();
+    void mw_initDefaultConfig();
+    QColor GetColorFromDist(uint16, uint8);
 
 };
 #endif // MAINWINDOW_H

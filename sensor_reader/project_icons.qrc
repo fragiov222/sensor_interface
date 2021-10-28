@@ -2,5 +2,6 @@
     <qresource prefix="/images">
         <file>green_dot.png</file>
         <file>red_dot.png</file>
+        <file>hsv_final.png</file>
     </qresource>
 </RCC>

@@ -23,12 +23,22 @@
 // //////////////////////// MSGS_IDs ///////////////////////////////////
 
 #define MAX_LEN_MSG                 4096
+
 #define ID_VL53LX_INIT_MSG          1
 #define ID_VL53LX_DATA_MSG          2
 
+#define ID_VL53LX_CONFIG_MSG        111
+#define ID_VL53LX_STOP_MSG          112
+
 #define LEN_VL53LX_INIT_MSG         5
 #define LEN_VL53LX_DATA_MSG         324
+#define LEN_VL53LX_DATA_64_MSG      324
+#define LEN_VL53LX_DATA_16_MSG      84
+#define LEN_VL53LX_CONFIG_MSG       6
+#define LEN_VL53LX_STOP_MSG         4
+
 #define VL53L5CX_RESOLUTION_64      64
+#define VL53L5CX_RESOLUTION_16      16
 
 
 typedef signed char               int8;   // signed 8 bit
@@ -75,6 +85,38 @@ typedef struct
     VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_64];
 
 } VL53LX_DATA_MSG;      //len 324
+
+typedef struct
+{
+    MSG_HEADER header;
+    uint8 id_tof;
+    VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_16];
+
+} VL53LX_DATA_16_MSG;      //len 84
+
+typedef struct
+{
+    MSG_HEADER header;
+    uint8 id_tof;
+    VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_64];
+
+} VL53LX_DATA_64_MSG;      //len 324
+
+typedef struct
+{
+    MSG_HEADER header;
+    uint8 resolution;
+    uint8 frequency;
+    uint8 sharpener;
+
+} VL53LX_CONFIG_MSG;       //len 6
+
+typedef struct
+{
+    MSG_HEADER header;
+    uint8 stop;
+
+} VL53LX_STOP_MSG;       //len 4
 
 #pragma pack(pop)
 

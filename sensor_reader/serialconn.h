@@ -67,7 +67,8 @@ public:
 
 signals:
     void SC_sendInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init);
-    void SC_sendDataMsgInfo(VL53LX_DATA_MSG *rcv_msg_data);
+    void SC_sendData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64);
+    void SC_sendData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16);
 
 public slots:
 
@@ -75,13 +76,17 @@ public slots:
 
     void SC_establishConn(QString);
     void SC_dismissConn();
+    void SC_MsgStartHandle(uint8, uint8, uint8);
+    void SC_SendStart();
+    void SC_SendStop();
 
 private:
 
     QSerialPort *serial;
 
     VL53LX_INIT_MSG *rcv_msg_init;
-    VL53LX_DATA_MSG *rcv_msg_data;
+    VL53LX_DATA_64_MSG *rcv_msg_data_64;
+    VL53LX_DATA_16_MSG *rcv_msg_data_16;
 
     void sc_configSerialConn();
     void sc_ManageRcvMsg(uint16 len);

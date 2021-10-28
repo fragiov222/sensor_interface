@@ -42,7 +42,9 @@ static char rcv_buf [MAX_LEN_MSG];      // buffer dei dati da ricevere
 static uint16 rcv_bytes_read;            // numero di byte letti per il mesaggio in lettura
 static uint16 rcv_bytes_to_read;         // numero di byte ancora da leggere per il messaggio in lettura (<= rcv_msg_rcv_len)
 static uint16 rcv_msg_rcv_len;           // numero di byte del messaggio
-
+static uint8 resolution;
+static uint8 frequency;
+static uint8 sharpener;
 /*!
  * *******************************************************************************
  *
@@ -87,8 +89,11 @@ SerialConn::SerialConn()
     rcv_msg_init = new VL53LX_INIT_MSG;
     memset(rcv_msg_init, 0, sizeof(VL53LX_INIT_MSG));
 
-    rcv_msg_data = new VL53LX_DATA_MSG;
-    memset(rcv_msg_data, 0, sizeof(VL53LX_DATA_MSG));
+    rcv_msg_data_64 = new VL53LX_DATA_64_MSG;
+    memset(rcv_msg_data_64, 0, sizeof(VL53LX_DATA_64_MSG));
+
+    rcv_msg_data_16 = new VL53LX_DATA_16_MSG;
+    memset(rcv_msg_data_16, 0, sizeof(VL53LX_DATA_16_MSG));
 
     // readyRead() signal is emitted once every time new data is available for reading from the device
     connect(serial, SIGNAL(readyRead()), this, SLOT(SC_readDataHandle()));
@@ -475,7 +480,7 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
     {
     case ID_VL53LX_INIT_MSG:
 
-        qDebug() << "\nVL53LX_INIT_MSG\n\n";
+        //qDebug() << "\nVL53LX_INIT_MSG\n\n";
         rcv_msg_init = reinterpret_cast<VL53LX_INIT_MSG*>(rcv_buf);
 
         // Mando le info al MainWindow in modo che riempa tabella e scriva nelle label
@@ -485,15 +490,168 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
 
     case ID_VL53LX_DATA_MSG:
 
-        qDebug() << "\nVL53LX_DATA_MSG\n\n";
+        //qDebug() << "\nVL53LX_DATA_MSG\n\n";
+        if(len == LEN_VL53LX_DATA_64_MSG)
+        {
+            rcv_msg_data_64 = reinterpret_cast<VL53LX_DATA_64_MSG*>(rcv_buf);
+            emit SC_sendData64MsgInfo(rcv_msg_data_64);
+        }
 
-        rcv_msg_data = reinterpret_cast<VL53LX_DATA_MSG*>(rcv_buf);
-
-        emit SC_sendDataMsgInfo(rcv_msg_data);
-
-
+        //qDebug() << "\nVL53LX_DATA_MSG\n\n";
+        else if(len == LEN_VL53LX_DATA_16_MSG)
+        {
+            rcv_msg_data_16 = reinterpret_cast<VL53LX_DATA_16_MSG*>(rcv_buf);
+            emit SC_sendData16MsgInfo(rcv_msg_data_16);
+        }
 
         break;
     }
 
 }
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn SerialConn::SC_MsgStartHandle(uint8 resolution_val, uint8 frequency_val, uint8 sharpener_val)
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione gestisce la modifica dei parametri del messaggio
+ *
+ *
+ * \n<b>Parameters</b>:\n
+ * 		- \n
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 29/01/2021
+ * \n- Author: Frnacesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+
+void SerialConn::SC_MsgStartHandle(uint8 resolution_val, uint8 frequency_val, uint8 sharpener_val)
+{
+
+    resolution = resolution_val;
+    frequency = frequency_val;
+    sharpener = sharpener_val;
+
+}   // SC_MsgStartHandle()
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn SerialConn::SC_SendStart()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce la il button "START"
+ *
+ *
+ * \n<b>Parameters</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 21/01/2021
+ * \n- Author: Frnacesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void SerialConn::SC_SendStart()
+{
+
+    // Buffer di dimensione arbitraria per l'invio del messaggio
+    char output_buffer[MAX_LEN_MSG];
+
+    QString msg_origin;
+    QString msg_name;
+
+
+    // casting del buffer al tipo del messaggio
+    ((VL53LX_CONFIG_MSG*)output_buffer)->header.msg_id= ID_VL53LX_CONFIG_MSG;
+    ((VL53LX_CONFIG_MSG*)output_buffer)->header.msg_len = LEN_VL53LX_CONFIG_MSG;
+    ((VL53LX_CONFIG_MSG*)output_buffer)->resolution = resolution;
+    ((VL53LX_CONFIG_MSG*)output_buffer)->frequency = frequency;
+    ((VL53LX_CONFIG_MSG*)output_buffer)->sharpener = sharpener;
+
+    serial->write(output_buffer, sizeof(VL53LX_CONFIG_MSG));
+
+}   //SC_SendStart()
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn SerialConn::SC_SendStop()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce la il button "STOP"
+ *
+ *
+ * \n<b>Parameters</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 21/01/2021
+ * \n- Author: Frnacesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void SerialConn::SC_SendStop()
+{
+
+    // Buffer di dimensione arbitraria per l'invio del messaggio
+    char output_buffer[MAX_LEN_MSG];
+
+    QString msg_origin;
+    QString msg_name;
+    uint8 stop = 1;
+
+    // casting del buffer al tipo del messaggio
+    ((VL53LX_STOP_MSG*)output_buffer)->header.msg_id= ID_VL53LX_STOP_MSG;
+    ((VL53LX_STOP_MSG*)output_buffer)->header.msg_len = LEN_VL53LX_STOP_MSG;
+    ((VL53LX_STOP_MSG*)output_buffer)->stop = stop;
+
+    serial->write(output_buffer, sizeof(VL53LX_STOP_MSG));
+
+}   //SC_SendStop()
+
