@@ -590,6 +590,7 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
     uint8 tof_id = static_cast<uint8>(rcv_msg_data16->id_tof);
     uint16 dist;
     uint8 status;
+    uint8 j = 0;
     QColor color_dist;
 
     if(msg_id == ID_VL53LX_DATA_MSG)
@@ -600,72 +601,78 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
         {
 
         case 1:
-
+                j = 0;
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
                     status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
                     color_dist = GetColorFromDist(dist,status);
-                    areas_1[2*i]->setBrush(color_dist);
-                    areas_1[(2*i)+1]->setBrush(color_dist);
-                    areas_1[(2*i)+8]->setBrush(color_dist);
-                    areas_1[(2*i)+9]->setBrush(color_dist);
+                    areas_1[(2*i) + j]->setBrush(color_dist);
+                    areas_1[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_1[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_1[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
                 }
 
             break;
 
         case 2:
+                j = 0;
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
                     status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
                     color_dist = GetColorFromDist(dist,status);
-                    areas_2[2*i]->setBrush(color_dist);
-                    areas_2[(2*i)+1]->setBrush(color_dist);
-                    areas_2[(2*i)+8]->setBrush(color_dist);
-                    areas_2[(2*i)+9]->setBrush(color_dist);
+                    areas_2[(2*i) + j]->setBrush(color_dist);
+                    areas_2[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_2[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_2[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
                 } 
             break;
 
         case 3:
-
+                j = 0;
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
                     status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
                     color_dist = GetColorFromDist(dist,status);
-                    areas_3[2*i]->setBrush(color_dist);
-                    areas_3[(2*i)+1]->setBrush(color_dist);
-                    areas_3[(2*i)+8]->setBrush(color_dist);
-                    areas_3[(2*i)+9]->setBrush(color_dist);
+                    areas_3[(2*i) + j]->setBrush(color_dist);
+                    areas_3[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_3[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_3[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
                 }
 
             break;
 
         case 4:
-
+                j = 0;
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
                     status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
                     color_dist = GetColorFromDist(dist,status);
-                    areas_4[2*i]->setBrush(color_dist);
-                    areas_4[(2*i)+1]->setBrush(color_dist);
-                    areas_4[(2*i)+8]->setBrush(color_dist);
-                    areas_4[(2*i)+9]->setBrush(color_dist);
+                    areas_4[(2*i) + j]->setBrush(color_dist);
+                    areas_4[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_4[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_4[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
                 }
 
             break;
         }
-
     }
 }
-
-
 
 /*!
  * *******************************************************************************
