@@ -429,7 +429,7 @@ void MainWindow::MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init)
     uint8 tof_id = static_cast<uint8>(rcv_msg_init->tof_id);
     uint8 tof_status = static_cast<uint8>(rcv_msg_init->tof_status);
 
-
+    stop_button->setEnabled(true);
 
     if(msg_id == ID_VL53LX_INIT_MSG)
     {
@@ -595,8 +595,6 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
 
     if(msg_id == ID_VL53LX_DATA_MSG)
     {
-        stop_button->setEnabled(true);
-
         switch(tof_id)
         {
 
@@ -713,8 +711,6 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
 
     if(msg_id == ID_VL53LX_DATA_MSG)
     {
-        stop_button->setEnabled(true);
-
         switch(tof_id)
         {
 
@@ -770,11 +766,8 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
 
             break;
         }
-
     }
 }
-
-
 
 /*!
  * *******************************************************************************

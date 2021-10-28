@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SERIALPORT_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_CHARTS_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../sensor_reader -I. -I../../../Qt5.12.11/5.12.11/gcc_64/include -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I. -I../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++
+INCPATH       = -I../sensor_reader -I. -I../../../Qt5.12.11/5.12.11/gcc_64/include -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I. -I../../../Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = sensor_reader1.0.0
 DISTDIR = /home/francesco/Documents/sensor_interface/Release/.tmp/sensor_reader1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/francesco/Qt5.12.11/5.12.11/gcc_64/lib
-LIBS          = $(SUBLIBS) /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Widgets.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Gui.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5SerialPort.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Charts.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Widgets.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Gui.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5SerialPort.so /home/francesco/Qt5.12.11/5.12.11/gcc_64/lib/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -714,7 +714,8 @@ compiler_rcc_clean:
 qrc_project_icons.cpp: ../sensor_reader/project_icons.qrc \
 		../../../Qt5.12.11/5.12.11/gcc_64/bin/rcc \
 		../sensor_reader/green_dot.png \
-		../sensor_reader/red_dot.png
+		../sensor_reader/red_dot.png \
+		../sensor_reader/hsv_final.png
 	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/rcc -name project_icons ../sensor_reader/project_icons.qrc -o qrc_project_icons.cpp
 
 compiler_qmlcache_make_all:
@@ -873,6 +874,16 @@ moc_mainwindow.cpp: ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QImage \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsScene \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpen.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpainter.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qtextoption.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qscrollarea.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -894,9 +905,43 @@ moc_mainwindow.cpp: ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QThread \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractAxis \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractaxis.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartglobal.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QtGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPen \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QFont \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QVariant \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QObject \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChart \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchart.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLegend \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlegend.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QBrush \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QMargins \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLineSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlineseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QXYSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qxyseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAreaSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qareaseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QColor \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QRadioButton \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qradiobutton.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QCheckBox \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qcheckbox.h \
 		moc_predefs.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/bin/moc
-	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/moc $(DEFINES) --include /home/francesco/Documents/sensor_interface/Release/moc_predefs.h -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++ -I/home/francesco/Documents/sensor_interface/sensor_reader -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtGui -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../sensor_reader/mainwindow.h -o moc_mainwindow.cpp
+	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/moc $(DEFINES) --include /home/francesco/Documents/sensor_interface/Release/moc_predefs.h -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++ -I/home/francesco/Documents/sensor_interface/sensor_reader -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCharts -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtGui -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../sensor_reader/mainwindow.h -o moc_mainwindow.cpp
 
 moc_serialconn.cpp: ../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QMainWindow \
@@ -1030,7 +1075,7 @@ moc_serialconn.cpp: ../sensor_reader/serialconn.h \
 		../sensor_reader/msg_struct.h \
 		moc_predefs.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/bin/moc
-	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/moc $(DEFINES) --include /home/francesco/Documents/sensor_interface/Release/moc_predefs.h -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++ -I/home/francesco/Documents/sensor_interface/sensor_reader -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtGui -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../sensor_reader/serialconn.h -o moc_serialconn.cpp
+	/home/francesco/Qt5.12.11/5.12.11/gcc_64/bin/moc $(DEFINES) --include /home/francesco/Documents/sensor_interface/Release/moc_predefs.h -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/mkspecs/linux-g++ -I/home/francesco/Documents/sensor_interface/sensor_reader -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCharts -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtWidgets -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtGui -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort -I/home/francesco/Qt5.12.11/5.12.11/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../sensor_reader/serialconn.h -o moc_serialconn.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1195,6 +1240,16 @@ main.o: ../sensor_reader/main.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QImage \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsScene \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpen.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpainter.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qtextoption.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qscrollarea.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -1216,6 +1271,40 @@ main.o: ../sensor_reader/main.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QThread \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractAxis \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractaxis.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartglobal.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QtGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPen \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QFont \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QVariant \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QObject \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChart \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchart.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLegend \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlegend.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QBrush \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QMargins \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLineSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlineseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QXYSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qxyseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAreaSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qareaseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QColor \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QRadioButton \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qradiobutton.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QCheckBox \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qcheckbox.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QApplication \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qapplication.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1367,6 +1456,16 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QDebug \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPixmap \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QString \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QImage \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsScene \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsscene.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpen.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qpainter.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qtextoption.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qscrollarea.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../sensor_reader/serialconn.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QWidget \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtSerialPort/QSerialPort \
@@ -1388,7 +1487,55 @@ mainwindow.o: ../sensor_reader/mainwindow.cpp ../sensor_reader/mainwindow.h \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QThread \
 		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qthread.h \
 		../sensor_reader/msg_struct.h \
-		ui_mainwindow.h
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartView \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartview.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractAxis \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractaxis.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChartGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchartglobal.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QtGlobal \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QPen \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QFont \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QVariant \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAbstractSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qabstractseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QObject \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QChart \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qchart.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLegend \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlegend.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QGraphicsWidget \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicswidget.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicslayoutitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QBrush \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/QMargins \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QLineSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qlineseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QXYSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qxyseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/QAreaSeries \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCharts/qareaseries.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/QColor \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QRadioButton \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qradiobutton.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QCheckBox \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qcheckbox.h \
+		ui_mainwindow.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QApplication \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtCore/qeventloop.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qguiapplication.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtGui/qinputmethod.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QMenuBar \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenubar.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qmenu.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qaction.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qactiongroup.h \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/QStatusBar \
+		../../../Qt5.12.11/5.12.11/gcc_64/include/QtWidgets/qstatusbar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../sensor_reader/mainwindow.cpp
 
 serialconn.o: ../sensor_reader/serialconn.cpp ../sensor_reader/serialconn.h \
