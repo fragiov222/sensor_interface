@@ -23,6 +23,7 @@
 #include <QColor>
 #include <QRadioButton>
 #include <QCheckBox>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,6 +42,8 @@ public:
 public slots:
     void MW_connectBtnHandle();
     void MW_ComboConnIndexChanged(int index);
+    void MW_TmrHandle();
+    void MW_saveBtnHandle();
 
     void MW_CheckConfigHandle(int check_state);
 
@@ -107,6 +110,10 @@ private:
     QComboBox *combo_serial_port;
     QPushButton *connect_button;
     QFormLayout *table_layout;
+
+    QTimer * tmr_acquisition;
+    QPushButton *save_csv_button;
+    QString textData;
 
     // Initialization GroupBox
     QGroupBox *box_init_msg;

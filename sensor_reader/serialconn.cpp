@@ -70,7 +70,7 @@ static uint8 sharpener;
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -128,7 +128,7 @@ SerialConn::SerialConn()
  *
  * \n- Version:	1.0
  * \n- Date: 04/10/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -174,7 +174,7 @@ void SerialConn::sc_configSerialConn()
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -257,8 +257,8 @@ void SerialConn::SC_dismissConn()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 21/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -302,8 +302,8 @@ SerialConn::~SerialConn()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 26/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -452,7 +452,7 @@ void SerialConn::SC_readDataHandle()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 26/01/2021
+ * \n- Date: 22/09/2021
  * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: prima implementazione.
@@ -533,8 +533,8 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 29/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -575,8 +575,8 @@ void SerialConn::SC_MsgStartHandle(uint8 resolution_val, uint8 frequency_val, ui
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 21/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -628,8 +628,8 @@ void SerialConn::SC_SendStart()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 21/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *

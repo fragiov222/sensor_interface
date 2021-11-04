@@ -6,6 +6,7 @@
 #define         WINDOW_WIDTH                        1500
 #define         WINDOW_HEIGTH                       600
 #define         CHART_DIM                           300
+#define         TIMER_INTERVAL                      15000
 
 /*
  *******************************************************************************
@@ -20,6 +21,8 @@ static QPixmap *hue_wheel;
 static uint8 resolution_val = VL53L5CX_RESOLUTION_64;
 static uint8 frequency_val;
 static uint8 sharpener_val;
+static bool flag_save = 0;
+static int counter = 0;
 
 /*!
  * *******************************************************************************
@@ -47,7 +50,7 @@ static uint8 sharpener_val;
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -100,6 +103,17 @@ MainWindow::MainWindow(QWidget *parent)
             combo_serial_port->addItem("/dev/"+port.portName());
     }
 
+    tmr_acquisition = new QTimer;
+    tmr_acquisition->setInterval(TIMER_INTERVAL);
+    save_csv_button = new QPushButton("SAVE TO CSV");
+    save_csv_button->setMaximumWidth(150);
+    save_csv_button->setMinimumWidth(150);
+    save_csv_button->setMaximumHeight(30);
+    save_csv_button->setMinimumHeight(30);
+    save_csv_button->setEnabled(false);
+
+    textData.clear();
+
     //layout di connessione
     layout_h_conn = new QHBoxLayout;
     layout_h_conn->addWidget(lbl_serial_port);
@@ -125,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Inserisco gli oggetti all interno del layout
     receiver_layout = new QGridLayout();
     receiver_layout->addLayout(layout_h_conn,0,0);
-    //receiver_layout->addWidget(box_init_msg,1,0);
+    receiver_layout->addWidget(save_csv_button,0,1,Qt::AlignRight);
     receiver_layout->addLayout(layout_hue,1,0);
     receiver_layout->addLayout(layout_complete,1,1);
 
@@ -160,6 +174,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Gestione del click sui pulsanti start e stop
     connect(start_button, SIGNAL(clicked(bool)),this,SLOT(MW_startBtnHandle()));
     connect(stop_button, SIGNAL(clicked(bool)),this,SLOT(MW_stopBtnHandle()));
+
+    // timeout() che gestisce la scrittura su CSV file
+    connect(tmr_acquisition, SIGNAL(timeout()), this, SLOT(MW_TmrHandle()));
+    // Gestione dei click sul pulsante "save to csv" per la connessione alla porta seriale
+    connect(this->save_csv_button, SIGNAL(clicked(bool)),this,SLOT(MW_saveBtnHandle()));
 
     connect(my_serial, SIGNAL(SC_sendInitMsgInfo(VL53LX_INIT_MSG*)), this,
                                     SLOT(MW_receiveInitMsgInfo(VL53LX_INIT_MSG*)));
@@ -199,7 +218,7 @@ MainWindow::~MainWindow()
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -257,8 +276,8 @@ void MainWindow::MW_connectBtnHandle()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 04/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -302,7 +321,7 @@ void MainWindow::MW_ComboConnIndexChanged(int index)
  *
  * \n- Version:	1.0
  * \n- Date: 05/10/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -467,12 +486,16 @@ void MainWindow::MW_receiveInitMsgInfo(VL53LX_INIT_MSG *rcv_msg_init)
 
             break;
 
-        case 3:
+        case 3: //tof prescelto per fare gli esperimenti
 
             if(tof_status == 0)
                 led_tof3->setPixmap(redscaled);
             else if(tof_status == 1)
+            {
                 led_tof3->setPixmap(greenscaled);
+                tmr_acquisition->start();
+                flag_save = 1;
+            }
             else
             {
                 qDebug() << "WRONG ToF STATUS";
@@ -600,6 +623,8 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
 
         case 1:
                 j = 0;
+                counter++;
+
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
@@ -610,6 +635,22 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                     areas_1[((2*i)+8) + j]->setBrush(color_dist);
                     areas_1[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
+
                     if(i == 3 || i == 7 || i == 11)
                         j += 8;
                 }
@@ -618,6 +659,8 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
 
         case 2:
                 j = 0;
+                counter++;
+
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
@@ -628,6 +671,22 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                     areas_2[((2*i)+8) + j]->setBrush(color_dist);
                     areas_2[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
+
                     if(i == 3 || i == 7 || i == 11)
                         j += 8;
                 } 
@@ -635,6 +694,8 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
 
         case 3:
                 j = 0;
+                counter++; // contatore incrementato ad ogni nuova misura per csv file
+
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
@@ -645,6 +706,22 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                     areas_3[((2*i)+8) + j]->setBrush(color_dist);
                     areas_3[((2*i)+9) + j]->setBrush(color_dist);
 
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
+
                     if(i == 3 || i == 7 || i == 11)
                         j += 8;
                 }
@@ -653,6 +730,8 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
 
         case 4:
                 j = 0;
+                counter ++;
+
                 for (int i = 0; i < 16; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
@@ -662,6 +741,22 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                     areas_4[((2*i)+1) + j]->setBrush(color_dist);
                     areas_4[((2*i)+8) + j]->setBrush(color_dist);
                     areas_4[((2*i)+9) + j]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
 
                     if(i == 3 || i == 7 || i == 11)
                         j += 8;
@@ -716,6 +811,8 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
 
         case 1:
 
+                counter ++;
+
                 for (int i = 0; i < 64; i++ )
                 {
                     dist = static_cast<uint16>(rcv_msg_data64->object_data[i].range_val);
@@ -723,11 +820,29 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                     //qDebug() << dist << "\n";
                     color_dist = GetColorFromDist(dist,status);
                     areas_1[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
                 }
 
             break;
 
         case 2:
+
+                counter ++;
 
                 for (int i = 0; i < 64; i++ )
                 {
@@ -736,11 +851,29 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                     //qDebug() << dist << "\n";
                     color_dist = GetColorFromDist(dist,status);
                     areas_2[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
                 }
 
             break;
 
         case 3:
+
+                counter ++;
 
                 for (int i = 0; i < 64; i++ )
                 {
@@ -749,11 +882,29 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                     //qDebug() << dist << "\n";
                     color_dist = GetColorFromDist(dist,status);
                     areas_3[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
                 }
 
             break;
 
         case 4:
+
+                counter ++;
 
                 for (int i = 0; i < 64; i++ )
                 {
@@ -762,6 +913,22 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                     //qDebug() << dist << "\n";
                     color_dist = GetColorFromDist(dist,status);
                     areas_4[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append("\n");
+                    }
                 }
 
             break;
@@ -792,7 +959,7 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
  *
  * \n- Version:	1.0
  * \n- Date: 05/10/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -810,9 +977,16 @@ QColor MainWindow::GetColorFromDist(uint16 dist, uint8 status)
         return color_dist;
     }
 
-    if(dist > 2500)
+    if(dist > 3000 && dist < 3500 )
     {
-        color_dist.setRgb(0,0,0,255);
+        value = 255 - (((dist-2000)*255)/500);
+        color_dist.setRgb(255,value,255,255);
+    }
+
+    if(dist > 2500 && dist < 3000 )
+    {
+        value = (((dist-2000)*255)/500);
+        color_dist.setRgb(255,255,value,255);
     }
     if(dist > 2000 && dist <= 2500)
     {
@@ -867,7 +1041,7 @@ QColor MainWindow::GetColorFromDist(uint16 dist, uint8 status)
  *
  * \n- Version:	1.0
  * \n- Date: 05/10/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1132,8 +1306,8 @@ void MainWindow::mw_boxChartConfig()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1183,8 +1357,8 @@ void MainWindow::MW_CheckConfigHandle(int check_state)
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1226,8 +1400,8 @@ void MainWindow::mw_initDefaultConfig()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1263,8 +1437,8 @@ void MainWindow::MW_4x4RadioBtnHandle()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1302,8 +1476,8 @@ void MainWindow::MW_8x8RadioBtnHandle()
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1342,8 +1516,8 @@ void MainWindow::MW_frequencyIndexChanged(int index)
  * \n<b>History</b>:
  *
  * \n- Version:	1.0
- * \n- Date: 28/01/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Date: 05/10/2021
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1381,7 +1555,7 @@ void MainWindow::MW_sharpenerIndexChanged(int index)
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1431,7 +1605,7 @@ void MainWindow::MW_startBtnHandle()
  *
  * \n- Version:	1.0
  * \n- Date: 22/09/2021
- * \n- Author: Frnacesco Giovinazzo
+ * \n- Author: Francesco Giovinazzo
  * \n- Description:
  * 		First Issue: fase preliminare
  *
@@ -1440,9 +1614,106 @@ void MainWindow::MW_startBtnHandle()
 
 void MainWindow::MW_stopBtnHandle()
 {
-    start_button->setEnabled(false);
+    start_button->setEnabled(true);
     stop_button->setEnabled(false);
+
+    led_tof1->setPixmap(redscaled);
+    led_tof2->setPixmap(redscaled);
+    led_tof3->setPixmap(redscaled);
+    led_tof4->setPixmap(redscaled);
+    led_tof5->setPixmap(redscaled);
+    led_tof6->setPixmap(redscaled);
+    led_tof7->setPixmap(redscaled);
+    led_tof8->setPixmap(redscaled);
 
     my_serial->SC_SendStop();
 
 }  //MW_stopBtnHandle()
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::MW_TmrHandle()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce l'evento timout per il timer di
+ *      scrittura su file
+ *
+ * \n<b>Parameters</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 02/11/2021
+ * \n- Author: Francesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void MainWindow::MW_TmrHandle()
+    {
+
+    save_csv_button->setEnabled(true);
+    flag_save = 0;
+    tmr_acquisition->stop();
+
+    }  //MW_TmrHandle()
+
+
+/*!
+ * *******************************************************************************
+ *
+ * \fn MainWindow::MW_saveBtnHandle()
+ *
+ * \brief
+ *
+ * \n<b>Description</b>:\n
+ * 		La funzione è l'handle (SLOT) che gestisce l'evento click del bottone
+ *     	CONNECT sulla GUI
+ *
+ * \n<b>Parameters</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Returns</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>Note & Remarks</b>:\n
+ * 		Nessuno
+ *
+ * \n<b>History</b>:
+ *
+ * \n- Version:	1.0
+ * \n- Date: 22/09/2021
+ * \n- Author: Francesco Giovinazzo
+ * \n- Description:
+ * 		First Issue: fase preliminare
+ *
+ ********************************************************************************
+ */
+
+void MainWindow::MW_saveBtnHandle()
+{
+    QFile csvFile("tableReport.csv");
+    if(csvFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+
+        QTextStream out(&csvFile);
+        out << textData;
+    }
+
+    csvFile.close();
+
+    save_csv_button->setEnabled(false);
+
+}//MW_saveBtnHandle()
