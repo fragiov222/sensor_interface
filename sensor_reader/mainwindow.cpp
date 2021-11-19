@@ -3,8 +3,8 @@
 #include "msg_struct.h"
 
 
-#define         WINDOW_WIDTH                        1500
-#define         WINDOW_HEIGTH                       600
+#define         WINDOW_WIDTH                        1600
+#define         WINDOW_HEIGTH                       900
 #define         CHART_DIM                           300
 #define         TIMER_INTERVAL                      15000
 
@@ -134,7 +134,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     layout_complete = new QVBoxLayout();
     layout_complete->addWidget(box_configuration);
-    layout_complete->addLayout(chart_layout);
+    layout_complete->addLayout(chart_layout_row1);
+    layout_complete->addLayout(chart_layout_row2);
 
     // Inserisco gli oggetti all interno del layout
     receiver_layout = new QGridLayout();
@@ -613,11 +614,16 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
     uint8 tof_id = static_cast<uint8>(rcv_msg_data16->id_tof);
     uint16 dist;
     uint8 status;
+    uint16 ms_get_new_data;
+    uint16 ms_send_msg;
     uint8 j = 0;
     QColor color_dist;
 
     if(msg_id == ID_VL53LX_DATA_MSG)
     {
+        ms_get_new_data = static_cast<uint16>(rcv_msg_data16->ms_get_new_data);
+        ms_send_msg = static_cast<uint16>(rcv_msg_data16->ms_send_msg);
+
         switch(tof_id)
         {
 
@@ -648,6 +654,12 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
 
@@ -684,6 +696,12 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
 
@@ -719,6 +737,12 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
 
@@ -755,6 +779,180 @@ void MainWindow::MW_receiveData16MsgInfo(VL53LX_DATA_16_MSG *rcv_msg_data16)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
+                }
+
+            break;
+
+        case 5:
+                j = 0;
+                counter++;
+
+                for (int i = 0; i < 16; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_5[(2*i) + j]->setBrush(color_dist);
+                    areas_5[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_5[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_5[((2*i)+9) + j]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
+                }
+
+            break;
+
+        case 6:
+                j = 0;
+                counter++;
+
+                for (int i = 0; i < 16; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_6[(2*i) + j]->setBrush(color_dist);
+                    areas_6[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_6[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_6[((2*i)+9) + j]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
+                }
+
+            break;
+
+        case 7:
+                j = 0;
+                counter++;
+
+                for (int i = 0; i < 16; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_7[(2*i) + j]->setBrush(color_dist);
+                    areas_7[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_7[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_7[((2*i)+9) + j]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+
+                    if(i == 3 || i == 7 || i == 11)
+                        j += 8;
+                }
+
+            break;
+
+        case 8:
+                j = 0;
+                counter++;
+
+                for (int i = 0; i < 16; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data16->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data16->object_data[i].range_status);
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_8[(2*i) + j]->setBrush(color_dist);
+                    areas_8[((2*i)+1) + j]->setBrush(color_dist);
+                    areas_8[((2*i)+8) + j]->setBrush(color_dist);
+                    areas_8[((2*i)+9) + j]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data16->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
 
@@ -802,10 +1000,17 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
     uint8 tof_id = static_cast<uint8>(rcv_msg_data64->id_tof);
     uint16 dist;
     uint8 status;
+    uint16 ms_get_new_data;
+    uint16 ms_send_msg;
     QColor color_dist;
 
     if(msg_id == ID_VL53LX_DATA_MSG)
     {
+
+        ms_get_new_data = static_cast<uint16>(rcv_msg_data64->ms_get_new_data);
+        ms_send_msg = static_cast<uint16>(rcv_msg_data64->ms_send_msg);
+
+
         switch(tof_id)
         {
 
@@ -834,6 +1039,12 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
                 }
@@ -865,6 +1076,12 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
                 }
@@ -896,6 +1113,12 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
                 }
@@ -927,6 +1150,160 @@ void MainWindow::MW_receiveData64MsgInfo(VL53LX_DATA_64_MSG *rcv_msg_data64)
                         textData.append((QString::number(dist)));
                         textData.append(";");
                         textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+                }
+
+            break;
+
+        case 5:
+
+                counter ++;
+
+                for (int i = 0; i < 64; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data64->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data64->object_data[i].range_status);
+                    //qDebug() << dist << "\n";
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_5[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+                }
+
+            break;
+
+        case 6:
+
+                counter ++;
+
+                for (int i = 0; i < 64; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data64->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data64->object_data[i].range_status);
+                    //qDebug() << dist << "\n";
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_6[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+                }
+
+            break;
+
+        case 7:
+
+                counter ++;
+
+                for (int i = 0; i < 64; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data64->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data64->object_data[i].range_status);
+                    //qDebug() << dist << "\n";
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_7[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
+                        textData.append("\n");
+                    }
+                }
+
+            break;
+
+        case 8:
+
+                counter ++;
+
+                for (int i = 0; i < 64; i++ )
+                {
+                    dist = static_cast<uint16>(rcv_msg_data64->object_data[i].range_val);
+                    status = static_cast<uint8>(rcv_msg_data64->object_data[i].range_status);
+                    //qDebug() << dist << "\n";
+                    color_dist = GetColorFromDist(dist,status);
+                    areas_8[i]->setBrush(color_dist);
+
+                    if( flag_save == 1 )
+                    {
+                        textData.append((QString::number(counter)));
+                        textData.append(";");
+                        textData.append((QString::number(TIMER_INTERVAL - tmr_acquisition->remainingTime())));
+                        textData.append(";");
+                        textData.append((QString::number(i)));
+                        textData.append(";");
+                        textData.append((QString::number(status)));
+                        textData.append(";");
+                        textData.append((QString::number(dist)));
+                        textData.append(";");
+                        textData.append((QString::number(static_cast<uint16>(rcv_msg_data64->object_data[i].sigma))));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_send_msg)));
+                        textData.append(";");
+                        textData.append((QString::number(ms_get_new_data + ms_send_msg)));
                         textData.append("\n");
                     }
                 }
@@ -1059,6 +1436,10 @@ void MainWindow::mw_boxChartConfig()
             seriesA_2[(8*i)+j] = seriesA;
             seriesA_3[(8*i)+j] = seriesA;
             seriesA_4[(8*i)+j] = seriesA;
+            seriesA_5[(8*i)+j] = seriesA;
+            seriesA_6[(8*i)+j] = seriesA;
+            seriesA_7[(8*i)+j] = seriesA;
+            seriesA_8[(8*i)+j] = seriesA;
         }
     }
 
@@ -1072,6 +1453,10 @@ void MainWindow::mw_boxChartConfig()
             seriesB_2[(8*i)+j] = seriesB;
             seriesB_3[(8*i)+j] = seriesB;
             seriesB_4[(8*i)+j] = seriesB;
+            seriesB_5[(8*i)+j] = seriesB;
+            seriesB_6[(8*i)+j] = seriesB;
+            seriesB_7[(8*i)+j] = seriesB;
+            seriesB_8[(8*i)+j] = seriesB;
         }
     }
     QPen pen(0x059605);
@@ -1114,6 +1499,42 @@ void MainWindow::mw_boxChartConfig()
         areas_4[i] = area;
     }
 
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(seriesA_5[i],seriesB_5[i]);
+        area->setBrush(color);
+        area->setPen(pen);
+
+        areas_5[i] = area;
+    }
+
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(seriesA_6[i],seriesB_6[i]);
+        area->setBrush(color);
+        area->setPen(pen);
+
+        areas_6[i] = area;
+    }
+
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(seriesA_7[i],seriesB_7[i]);
+        area->setBrush(color);
+        area->setPen(pen);
+
+        areas_7[i] = area;
+    }
+
+    for(int i = 0; i < 64; i++)
+    {
+        area = new QAreaSeries(seriesA_8[i],seriesB_8[i]);
+        area->setBrush(color);
+        area->setPen(pen);
+
+        areas_8[i] = area;
+    }
+
 
     chart_1 = new QChart();
     for(int i = 0; i < 64; i++)
@@ -1138,6 +1559,34 @@ void MainWindow::mw_boxChartConfig()
     {
         chart_4->addSeries(areas_4[i]);
     }
+
+    chart_5 = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_5->addSeries(areas_5[i]);
+    }
+
+
+    chart_6 = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_6->addSeries(areas_6[i]);
+    }
+
+
+    chart_7 = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_7->addSeries(areas_7[i]);
+    }
+
+
+    chart_8 = new QChart();
+    for(int i = 0; i < 64; i++)
+    {
+        chart_8->addSeries(areas_8[i]);
+    }
+
 
     chart_1->setTitle("TOF 1");
     chart_1->legend()->hide();
@@ -1164,6 +1613,30 @@ void MainWindow::mw_boxChartConfig()
     chart_4->axes(Qt::Horizontal).first()->setRange(0, 8);
     chart_4->axes(Qt::Vertical).first()->setRange(0, 8);
 
+    chart_5->setTitle("TOF 5");
+    chart_5->legend()->hide();
+    chart_5->createDefaultAxes();
+    chart_5->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_5->axes(Qt::Vertical).first()->setRange(0, 8);
+
+    chart_6->setTitle("TOF 6");
+    chart_6->legend()->hide();
+    chart_6->createDefaultAxes();
+    chart_6->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_6->axes(Qt::Vertical).first()->setRange(0, 8);
+
+    chart_7->setTitle("TOF 7");
+    chart_7->legend()->hide();
+    chart_7->createDefaultAxes();
+    chart_7->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_7->axes(Qt::Vertical).first()->setRange(0, 8);
+
+    chart_8->setTitle("TOF 8");
+    chart_8->legend()->hide();
+    chart_8->createDefaultAxes();
+    chart_8->axes(Qt::Horizontal).first()->setRange(0, 8);
+    chart_8->axes(Qt::Vertical).first()->setRange(0, 8);
+
     chartView_1 = new QChartView(chart_1);
     chartView_1->setRenderHint(QPainter::Antialiasing);
     chartView_1->setMinimumSize(CHART_DIM,CHART_DIM);
@@ -1184,11 +1657,37 @@ void MainWindow::mw_boxChartConfig()
     chartView_4->setMinimumSize(CHART_DIM,CHART_DIM);
     chartView_4->setMaximumSize(CHART_DIM,CHART_DIM);
 
-    chart_layout = new QHBoxLayout;
-    chart_layout->addWidget(chartView_4);
-    chart_layout->addWidget(chartView_3);
-    chart_layout->addWidget(chartView_2);
-    chart_layout->addWidget(chartView_1);
+    chartView_5 = new QChartView(chart_5);
+    chartView_5->setRenderHint(QPainter::Antialiasing);
+    chartView_5->setMinimumSize(CHART_DIM,CHART_DIM);
+    chartView_5->setMaximumSize(CHART_DIM,CHART_DIM);
+
+    chartView_6 = new QChartView(chart_6);
+    chartView_6->setRenderHint(QPainter::Antialiasing);
+    chartView_6->setMinimumSize(CHART_DIM,CHART_DIM);
+    chartView_6->setMaximumSize(CHART_DIM,CHART_DIM);
+
+    chartView_7 = new QChartView(chart_7);
+    chartView_7->setRenderHint(QPainter::Antialiasing);
+    chartView_7->setMinimumSize(CHART_DIM,CHART_DIM);
+    chartView_7->setMaximumSize(CHART_DIM,CHART_DIM);
+
+    chartView_8 = new QChartView(chart_8);
+    chartView_8->setRenderHint(QPainter::Antialiasing);
+    chartView_8->setMinimumSize(CHART_DIM,CHART_DIM);
+    chartView_8->setMaximumSize(CHART_DIM,CHART_DIM);
+
+    chart_layout_row1 = new QHBoxLayout;
+    chart_layout_row1->addWidget(chartView_1);
+    chart_layout_row1->addWidget(chartView_2);
+    chart_layout_row1->addWidget(chartView_3);
+    chart_layout_row1->addWidget(chartView_4);
+
+    chart_layout_row2 = new QHBoxLayout;
+    chart_layout_row2->addWidget(chartView_5);
+    chart_layout_row2->addWidget(chartView_6);
+    chart_layout_row2->addWidget(chartView_7);
+    chart_layout_row2->addWidget(chartView_8);
 
     check_configuration_default = new QCheckBox("Default configuration");
     check_configuration_default->setChecked(true);

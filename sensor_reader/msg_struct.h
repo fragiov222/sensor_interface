@@ -32,8 +32,8 @@
 
 #define LEN_VL53LX_INIT_MSG         5
 #define LEN_VL53LX_DATA_MSG         324
-#define LEN_VL53LX_DATA_64_MSG      324
-#define LEN_VL53LX_DATA_16_MSG      84
+#define LEN_VL53LX_DATA_64_MSG      328
+#define LEN_VL53LX_DATA_16_MSG      88
 #define LEN_VL53LX_CONFIG_MSG       6
 #define LEN_VL53LX_STOP_MSG         4
 
@@ -90,7 +90,9 @@ typedef struct
 {
     MSG_HEADER header;
     uint8 id_tof;
+    uint16 ms_get_new_data;
     VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_16];
+    uint16 ms_send_msg;
 
 } VL53LX_DATA_16_MSG;      //len 84
 
@@ -98,7 +100,9 @@ typedef struct
 {
     MSG_HEADER header;
     uint8 id_tof;
+    uint16 ms_get_new_data;
     VL53LX_OBJ_INFO object_data[VL53L5CX_RESOLUTION_64];
+    uint16 ms_send_msg;
 
 } VL53LX_DATA_64_MSG;      //len 324
 

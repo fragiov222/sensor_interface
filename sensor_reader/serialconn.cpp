@@ -480,7 +480,7 @@ void SerialConn::sc_ManageRcvMsg(uint16 len)
     {
     case ID_VL53LX_INIT_MSG:
 
-        //qDebug() << "\nVL53LX_INIT_MSG\n\n";
+        qDebug() << "\nVL53LX_INIT_MSG\n\n";
         rcv_msg_init = reinterpret_cast<VL53LX_INIT_MSG*>(rcv_buf);
 
         // Mando le info al MainWindow in modo che riempa tabella e scriva nelle label

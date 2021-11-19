@@ -69,7 +69,8 @@ private:
     QHBoxLayout *layout_h_conn;
     QVBoxLayout *config_layout;
     QVBoxLayout *layout_v_sensors;
-    QHBoxLayout * chart_layout;
+    QHBoxLayout * chart_layout_row1;
+    QHBoxLayout * chart_layout_row2;
     QHBoxLayout *layout_hue;
 
 
@@ -81,6 +82,10 @@ private:
     QChartView *chartView_2;
     QChartView *chartView_3;
     QChartView *chartView_4;
+    QChartView *chartView_5;
+    QChartView *chartView_6;
+    QChartView *chartView_7;
+    QChartView *chartView_8;
 
     QLineSeries *seriesA_1[64];
     QLineSeries *seriesB_1[64];
@@ -90,6 +95,14 @@ private:
     QLineSeries *seriesB_3[64];
     QLineSeries *seriesA_4[64];
     QLineSeries *seriesB_4[64];
+    QLineSeries *seriesA_5[64];
+    QLineSeries *seriesB_5[64];
+    QLineSeries *seriesA_6[64];
+    QLineSeries *seriesB_6[64];
+    QLineSeries *seriesA_7[64];
+    QLineSeries *seriesB_7[64];
+    QLineSeries *seriesA_8[64];
+    QLineSeries *seriesB_8[64];
     QLineSeries *seriesA;
     QLineSeries *seriesB;
 
@@ -97,12 +110,20 @@ private:
     QAreaSeries *areas_2[64];
     QAreaSeries *areas_3[64];
     QAreaSeries *areas_4[64];
+    QAreaSeries *areas_5[64];
+    QAreaSeries *areas_6[64];
+    QAreaSeries *areas_7[64];
+    QAreaSeries *areas_8[64];
     QAreaSeries *area;
 
     QChart *chart_1;
     QChart *chart_2;
     QChart *chart_3;
     QChart *chart_4;
+    QChart *chart_5;
+    QChart *chart_6;
+    QChart *chart_7;
+    QChart *chart_8;
 
     // Connection widgets
     QFormLayout *connection_layout;
